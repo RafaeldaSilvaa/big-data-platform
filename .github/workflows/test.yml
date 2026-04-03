@@ -155,3 +155,92 @@ jobs:
 
       - name: Run Docker image functional tests
         run: python -m pytest tests/test_platform.py::TestDockerImages -v --tb=short
+
+  integration-test:
+    name: Integration Test - All Services
+    runs-on: ubuntu-latest
+    needs: build-all
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Start all services
+        run: docker compose up -d
+
+      - name: Wait for services to initialize
+        run: sleep 30
+
+      - name: Test ZooKeeper service
+        run: |
+          docker compose exec -T zookeeper bash -c "zkServer.sh status" || exit 1
+          echo "ZooKeeper is running"
+
+      - name: Test Kafka service
+        run: |
+          docker compose exec -T kafka bash -c "kafka-topics.sh --list --bootstrap-server localhost:9092" || exit 1
+          echo "Kafka is running"
+
+      - name: Test Hadoop HDFS service
+        run: |
+          docker compose exec -T hadoop bash -c "hdfs dfsadmin -report" || exit 1
+          echo "Hadoop HDFS is running"
+
+      - name: Test Hadoop YARN service
+        run: |
+          docker compose exec -T hadoop bash -c "yarn node -list" || exit 1
+          echo "Hadoop YARN is running"
+
+      - name: Test Spark Master service
+        run: |
+          docker compose exec -T spark bash -c "spark-submit --version" || exit 1
+          echo "Spark Master is running"
+
+      - name: Test Hive service
+        run: |
+          docker compose exec -T hive bash -c "hive --version" || exit 1
+          echo "Hive is running"
+
+      - name: Test HBase service
+        run: |
+          docker compose exec -T hbase bash -c "hbase shell status" || exit 1
+          echo "HBase is running"
+
+      - name: Test NiFi service
+        run: |
+          curl -f http://localhost:8082/nifi-api/controller/flow || exit 1
+          echo "NiFi is running"
+
+      - name: Test Sqoop service
+        run: |
+          docker compose exec -T sqoop bash -c "sqoop version" || exit 1
+          echo "Sqoop is running"
+
+      - name: Test Oozie service
+        run: |
+          docker compose exec -T oozie bash -c "ls /opt/oozie/bin/oozie" || exit 1
+          echo "Oozie is running"
+
+      - name: Test Pig service
+        run: |
+          docker compose exec -T pig bash -c "pig -version" || exit 1
+          echo "Pig is running"
+
+      - name: Test Mahout service
+        run: |
+          docker compose exec -T mahout bash -c "ls /opt/mahout/bin" || exit 1
+          echo "Mahout is running"
+
+      - name: Test Flume service
+        run: |
+          docker compose exec -T flume bash -c "flume-ng version" || exit 1
+          echo "Flume is running"
+
+      - name: Show all container statuses
+        run: docker compose ps
+
+      - name: Stop all services
+        if: always()
+        run: docker compose down -v
