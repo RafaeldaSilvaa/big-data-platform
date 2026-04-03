@@ -117,52 +117,52 @@ jobs:
         run: docker build -t ${{ matrix.tag }} -f ${{ matrix.dockerfile }} .
 
       - name: Test ${{ matrix.name }} Image - Java availability
-        run: docker run --rm ${{ matrix.tag }} which java > /dev/null && echo "✓ Java is available"
+        run: docker run --rm ${{ matrix.tag }} which java
 
       - name: Test ${{ matrix.name }} Image - JAVA_HOME set
-        run: docker run --rm ${{ matrix.tag }} bash -c "[[ ! -z \$JAVA_HOME ]] && echo '✓ JAVA_HOME is set to: '$JAVA_HOME"
+        run: docker run --rm ${{ matrix.tag }} bash -c "test -n $JAVA_HOME"
 
       - name: Test ${{ matrix.name }} Image - Services available
         run: |
           case ${{ matrix.name }} in
             Base)
-              docker run --rm ${{ matrix.tag }} java -version 2>&1 && echo "✓ Java functional"
+              docker run --rm ${{ matrix.tag }} java -version
               ;;
             Hadoop)
-              docker run --rm ${{ matrix.tag }} bash -c "which hadoop && hadoop version | head -2" && echo "✓ Hadoop functional"
+              docker run --rm ${{ matrix.tag }} bash -c "which hadoop && hadoop version | head -2"
               ;;
             Zookeeper)
-              docker run --rm ${{ matrix.tag }} bash -c "which zkServer.sh && echo '✓ ZooKeeper functional'"
+              docker run --rm ${{ matrix.tag }} bash -c "which zkServer.sh"
               ;;
             Kafka)
-              docker run --rm ${{ matrix.tag }} bash -c "which kafka-topics.sh && echo '✓ Kafka functional'"
+              docker run --rm ${{ matrix.tag }} bash -c "which kafka-topics.sh"
               ;;
             Spark)
-              docker run --rm ${{ matrix.tag }} bash -c "spark-submit --version 2>&1 | head -2" && echo "✓ Spark functional"
+              docker run --rm ${{ matrix.tag }} bash -c "spark-submit --version"
               ;;
             Hive)
-              docker run --rm ${{ matrix.tag }} bash -c "which hive && hive --version 2>&1 | head -1" && echo "✓ Hive functional"
+              docker run --rm ${{ matrix.tag }} bash -c "which hive && hive --version"
               ;;
             HBase)
-              docker run --rm ${{ matrix.tag }} bash -c "which hbase && hbase version | head -2" && echo "✓ HBase functional"
+              docker run --rm ${{ matrix.tag }} bash -c "which hbase && hbase version"
               ;;
             NiFi)
-              docker run --rm ${{ matrix.tag }} bash -c "[[ -f /opt/nifi/current/bin/nifi.sh ]]" && echo "✓ NiFi functional"
+              docker run --rm ${{ matrix.tag }} bash -c "test -f /opt/nifi/current/bin/nifi.sh"
               ;;
             Sqoop)
-              docker run --rm ${{ matrix.tag }} bash -c "which sqoop && sqoop version 2>&1 | head -1" && echo "✓ Sqoop functional"
+              docker run --rm ${{ matrix.tag }} bash -c "which sqoop && sqoop version"
               ;;
             Oozie)
-              docker run --rm ${{ matrix.tag }} bash -c "[[ -f /opt/oozie/bin/oozie ]]" && echo "✓ Oozie functional"
+              docker run --rm ${{ matrix.tag }} bash -c "test -f /opt/oozie/bin/oozie"
               ;;
             Pig)
-              docker run --rm ${{ matrix.tag }} bash -c "which pig && pig -version 2>&1 | head -1" && echo "✓ Pig functional"
+              docker run --rm ${{ matrix.tag }} bash -c "which pig && pig -version"
               ;;
             Mahout)
-              docker run --rm ${{ matrix.tag }} bash -c "[[ -d /opt/mahout/bin ]]" && echo "✓ Mahout functional"
+              docker run --rm ${{ matrix.tag }} bash -c "test -d /opt/mahout/bin"
               ;;
             Flume)
-              docker run --rm ${{ matrix.tag }} bash -c "which flume-ng && echo '✓ Flume functional'"
+              docker run --rm ${{ matrix.tag }} bash -c "which flume-ng"
               ;;
           esac
 
