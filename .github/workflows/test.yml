@@ -95,8 +95,6 @@ jobs:
       - name: Build NiFi Image
         run: docker build -t bigdata-platform-nifi:latest -f images/nifi/Dockerfile .
 
-      - name: Build Flume Image
-        run: docker build -t bigdata-platform-flume:latest -f images/flume/Dockerfile .
 
       - name: Build Sqoop Image
         run: docker build -t bigdata-platform-sqoop:latest -f images/sqoop/Dockerfile .
@@ -104,8 +102,6 @@ jobs:
       - name: Build Oozie Image
         run: docker build -t bigdata-platform-oozie:latest -f images/oozie/Dockerfile .
 
-      - name: Build Mahout Image
-        run: docker build -t bigdata-platform-mahout:latest -f images/mahout/Dockerfile .
 
       - name: Build Pig Image
         run: docker build -t bigdata-platform-pig:latest -f images/pig/Dockerfile .
