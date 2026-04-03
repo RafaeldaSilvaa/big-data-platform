@@ -60,8 +60,8 @@ jobs:
       - name: Run lint
         run: cd frontend && npx eslint src --ext .js,.jsx || true
 
-  build-base:
-    name: Build Base Image
+  build-all:
+    name: Build All Docker Images
     runs-on: ubuntu-latest
     needs: validate
     steps:
@@ -74,48 +74,44 @@ jobs:
       - name: Build Base Image
         run: docker build -t bigdata-platform-base:latest images/base
 
-  build-hadoop:
-    name: Build Hadoop Image
-    runs-on: ubuntu-latest
-    needs: build-base
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
-
       - name: Build Hadoop Image
         run: docker build -t bigdata-platform-hadoop:latest images/hadoop
 
-  build-images:
-    name: Build Remaining Images
-    runs-on: ubuntu-latest
-    needs: build-hadoop
-    strategy:
-      fail-fast: false
-      matrix:
-        image: [spark, hive, hbase, kafka, zookeeper, nifi, flume, sqoop, oozie, mahout, pig]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Build Spark Image
+        run: docker build -t bigdata-platform-spark:latest images/spark
 
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
+      - name: Build Hive Image
+        run: docker build -t bigdata-platform-hive:latest images/hive
 
-      - name: Build ${{ matrix.image }} Image
-        run: docker build -t bigdata-platform-${{ matrix.image }}:latest images/${{ matrix.image }}
+      - name: Build HBase Image
+        run: docker build -t bigdata-platform-hbase:latest images/hbase
 
-  test-compose:
-    name: Test Docker Compose
-    runs-on: ubuntu-latest
-    needs: build-images
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Build Kafka Image
+        run: docker build -t bigdata-platform-kafka:latest images/kafka
 
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
+      - name: Build ZooKeeper Image
+        run: docker build -t bigdata-platform-zookeeper:latest images/zookeeper
 
-      - name: Docker Compose config test
+      - name: Build NiFi Image
+        run: docker build -t bigdata-platform-nifi:latest images/nifi
+
+      - name: Build Flume Image
+        run: docker build -t bigdata-platform-flume:latest images/flume
+
+      - name: Build Sqoop Image
+        run: docker build -t bigdata-platform-sqoop:latest images/sqoop
+
+      - name: Build Oozie Image
+        run: docker build -t bigdata-platform-oozie:latest images/oozie
+
+      - name: Build Mahout Image
+        run: docker build -t bigdata-platform-mahout:latest images/mahout
+
+      - name: Build Pig Image
+        run: docker build -t bigdata-platform-pig:latest images/pig
+
+      - name: List all built images
+        run: docker images | grep bigdata-platform
+
+      - name: Test Docker Compose
         run: docker compose config --services
