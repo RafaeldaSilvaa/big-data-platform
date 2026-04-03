@@ -24,7 +24,7 @@ RUN mkdir -p ${KAFKA_HOME}/logs \
     && chown -R hadoop:hadoop /opt/kafka /var/lib/kafka
 
 # Copy configuration
-COPY config/kafka/* ${KAFKA_CONF_DIR}/
+COPY ../../config/kafka/* ${KAFKA_CONF_DIR}/
 
 # Environment variables
 ENV KAFKA_LOG_DIR=${KAFKA_HOME}/logs

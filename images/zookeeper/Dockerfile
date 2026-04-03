@@ -24,7 +24,7 @@ RUN mkdir -p ${ZOOKEEPER_HOME}/logs \
     && chown -R hadoop:hadoop /opt/zookeeper /var/lib/zookeeper /var/log/zookeeper
 
 # Copy configuration
-COPY config/zookeeper/* ${ZOOKEEPER_CONF_DIR}/
+COPY ../../config/zookeeper/* ${ZOOKEEPER_CONF_DIR}/
 
 # Environment variables
 ENV ZOOKEEPER_HOME=/opt/zookeeper

@@ -27,7 +27,7 @@ RUN mkdir -p ${NIFI_HOME}/logs \
     && chown -R hadoop:hadoop /opt/nifi /data/nifi /flowfile_repository /content_repository /provenance_repository /state
 
 # Copy configuration
-COPY config/nifi/* ${NIFI_CONF_DIR}/
+COPY ../../config/nifi/* ${NIFI_CONF_DIR}/
 
 # Environment variables
 ENV NIFI_HOME=/opt/nifi/current

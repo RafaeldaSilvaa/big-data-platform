@@ -28,7 +28,7 @@ RUN mkdir -p ${HIVE_HOME}/logs \
     && chown -R hadoop:hadoop /opt/hive /warehouse /metastore /tmp/hive
 
 # Copy Hive configuration
-COPY config/hive/* ${HIVE_CONF_DIR}/
+COPY ../../config/hive/* ${HIVE_CONF_DIR}/
 
 # Environment variables
 ENV HIVE_HOME=/opt/hive
