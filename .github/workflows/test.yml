@@ -74,9 +74,6 @@ jobs:
       - name: Build Base Image
         run: docker build -t bigdata-platform-base:latest images/base
 
-      - name: Push Base Image
-        run: docker push bigdata-platform-base:latest
-
   build-hadoop:
     name: Build Hadoop Image
     runs-on: ubuntu-latest
@@ -91,14 +88,12 @@ jobs:
       - name: Build Hadoop Image
         run: docker build -t bigdata-platform-hadoop:latest images/hadoop
 
-      - name: Push Hadoop Image
-        run: docker push bigdata-platform-hadoop:latest
-
   build-images:
     name: Build Remaining Images
     runs-on: ubuntu-latest
     needs: build-hadoop
     strategy:
+      fail-fast: false
       matrix:
         image: [spark, hive, hbase, kafka, zookeeper, nifi, flume, sqoop, oozie, mahout, pig]
     steps:
@@ -111,5 +106,16 @@ jobs:
       - name: Build ${{ matrix.image }} Image
         run: docker build -t bigdata-platform-${{ matrix.image }}:latest images/${{ matrix.image }}
 
-      - name: List images
-        run: docker images | grep bigdata-platform
+  test-compose:
+    name: Test Docker Compose
+    runs-on: ubuntu-latest
+    needs: build-images
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Compose config test
+        run: docker compose config --services
