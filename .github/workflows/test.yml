@@ -60,8 +60,8 @@ jobs:
       - name: Run lint
         run: cd frontend && npx eslint src --ext .js,.jsx || true
 
-  build-base:
-    name: Build Base Image
+  build-all:
+    name: Build All Docker Images
     runs-on: ubuntu-latest
     needs: validate
     steps:
@@ -74,82 +74,43 @@ jobs:
       - name: Build Base Image
         run: docker build -t bigdata-platform-base:latest -f images/base/Dockerfile .
 
-  build-hadoop:
-    name: Build Hadoop Image
-    runs-on: ubuntu-latest
-    needs: build-base
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
-
       - name: Build Hadoop Image
         run: docker build -t bigdata-platform-hadoop:latest -f images/hadoop/Dockerfile .
 
-  build-services:
-    name: Build Service Images
-    runs-on: ubuntu-latest
-    needs: build-hadoop
-    strategy:
-      matrix:
-        include:
-          - name: Zookeeper
-            dockerfile: images/zookeeper/Dockerfile
-            tag: bigdata-platform-zookeeper:latest
-          - name: Kafka
-            dockerfile: images/kafka/Dockerfile
-            tag: bigdata-platform-kafka:latest
-          - name: Spark
-            dockerfile: images/spark/Dockerfile
-            tag: bigdata-platform-spark:latest
-          - name: Hive
-            dockerfile: images/hive/Dockerfile
-            tag: bigdata-platform-hive:latest
-          - name: HBase
-            dockerfile: images/hbase/Dockerfile
-            tag: bigdata-platform-hbase:latest
-          - name: NiFi
-            dockerfile: images/nifi/Dockerfile
-            tag: bigdata-platform-nifi:latest
-          - name: Sqoop
-            dockerfile: images/sqoop/Dockerfile
-            tag: bigdata-platform-sqoop:latest
-          - name: Oozie
-            dockerfile: images/oozie/Dockerfile
-            tag: bigdata-platform-oozie:latest
-          - name: Pig
-            dockerfile: images/pig/Dockerfile
-            tag: bigdata-platform-pig:latest
-          - name: Mahout
-            dockerfile: images/mahout/Dockerfile
-            tag: bigdata-platform-mahout:latest
-          - name: Flume
-            dockerfile: images/flume/Dockerfile
-            tag: bigdata-platform-flume:latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Build ZooKeeper Image
+        run: docker build -t bigdata-platform-zookeeper:latest -f images/zookeeper/Dockerfile .
 
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
+      - name: Build Kafka Image
+        run: docker build -t bigdata-platform-kafka:latest -f images/kafka/Dockerfile .
 
-      - name: Build ${{ matrix.name }} Image
-        run: docker build -t ${{ matrix.tag }} -f ${{ matrix.dockerfile }} .
+      - name: Build Spark Image
+        run: docker build -t bigdata-platform-spark:latest -f images/spark/Dockerfile .
 
-  verify-builds:
-    name: Verify All Builds
-    runs-on: ubuntu-latest
-    needs: build-services
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Build Hive Image
+        run: docker build -t bigdata-platform-hive:latest -f images/hive/Dockerfile .
 
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
+      - name: Build HBase Image
+        run: docker build -t bigdata-platform-hbase:latest -f images/hbase/Dockerfile .
 
-      - name: List built images
+      - name: Build NiFi Image
+        run: docker build -t bigdata-platform-nifi:latest -f images/nifi/Dockerfile .
+
+      - name: Build Sqoop Image
+        run: docker build -t bigdata-platform-sqoop:latest -f images/sqoop/Dockerfile .
+
+      - name: Build Oozie Image
+        run: docker build -t bigdata-platform-oozie:latest -f images/oozie/Dockerfile .
+
+      - name: Build Pig Image
+        run: docker build -t bigdata-platform-pig:latest -f images/pig/Dockerfile .
+
+      - name: Build Mahout Image
+        run: docker build -t bigdata-platform-mahout:latest -f images/mahout/Dockerfile .
+
+      - name: Build Flume Image
+        run: docker build -t bigdata-platform-flume:latest -f images/flume/Dockerfile .
+
+      - name: List all built images
         run: docker images | grep bigdata-platform
 
       - name: Verify docker-compose services
@@ -158,7 +119,7 @@ jobs:
   test-platform:
     name: Run Platform Tests
     runs-on: ubuntu-latest
-    needs: build-services
+    needs: build-all
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
