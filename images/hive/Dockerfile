@@ -34,6 +34,7 @@ COPY config/hive/* ${HIVE_CONF_DIR}/
 ENV HIVE_HOME=/opt/hive
 ENV HIVE_CONF_DIR=/opt/hive/conf
 ENV PATH=${HIVE_HOME}/bin:${PATH}
+ENV JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
 
 # Expose ports
 EXPOSE 10000 10002

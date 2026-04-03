@@ -30,6 +30,8 @@ COPY config/spark/* ${SPARK_CONF_DIR}/
 ENV SPARK_LOG_DIR=/var/log/spark
 ENV PYSPARK_PYTHON=/usr/bin/python3
 ENV PYSPARK_DRIVER_PYTHON=python3
+ENV PATH=${SPARK_HOME}/bin:${PATH}
+ENV JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
 
 # Expose ports
 EXPOSE 8080 8081 7077 4040 4041 18080

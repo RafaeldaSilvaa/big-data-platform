@@ -29,6 +29,8 @@ COPY config/hbase/* ${HBASE_CONF_DIR}/
 
 # Environment variables
 ENV HBASE_LOG_DIR=/hbase/logs
+ENV PATH=${HBASE_HOME}/bin:${PATH}
+ENV JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
 
 # Expose ports
 EXPOSE 16000 16010 16030

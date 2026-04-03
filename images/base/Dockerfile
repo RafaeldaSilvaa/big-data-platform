@@ -37,7 +37,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Set Java environment
-ENV JAVA_HOME=/opt/java/openjdk
+ENV JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
 ENV PATH=$JAVA_HOME/bin:$PATH
 
 # Set working directory

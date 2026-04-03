@@ -24,6 +24,8 @@ RUN mkdir -p ${MAHOUT_HOME}/logs \
 
 # Environment variables
 ENV MAHOUT_HOME=/opt/mahout
+ENV PATH=${MAHOUT_HOME}/bin:${PATH}
+ENV JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
 
 WORKDIR /opt/mahout
 

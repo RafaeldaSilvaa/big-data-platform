@@ -24,6 +24,8 @@ RUN mkdir -p ${FLUME_HOME}/logs \
 
 # Environment variables
 ENV FLUME_HOME=/opt/flume
+ENV PATH=${FLUME_HOME}/bin:${PATH}
+ENV JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
 
 # Expose ports
 EXPOSE 41414 4141

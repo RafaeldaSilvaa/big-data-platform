@@ -28,6 +28,8 @@ COPY config/kafka/* ${KAFKA_CONF_DIR}/
 
 # Environment variables
 ENV KAFKA_LOG_DIR=${KAFKA_HOME}/logs
+ENV PATH=${KAFKA_HOME}/bin:${PATH}
+ENV JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
 
 # Expose ports
 EXPOSE 9092 9093 29092

@@ -25,6 +25,8 @@ RUN mkdir -p ${OOZIE_HOME}/logs \
 
 # Environment variables
 ENV OOZIE_HOME=/opt/oozie
+ENV PATH=${OOZIE_HOME}/bin:${PATH}
+ENV JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
 
 # Expose ports
 EXPOSE 11000 11001

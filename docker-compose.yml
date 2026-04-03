@@ -7,7 +7,7 @@ services:
   zookeeper:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/zookeeper/Dockerfile
     container_name: zookeeper
     hostname: zookeeper
     ports:
@@ -22,19 +22,19 @@ services:
     networks:
       - bigdata-network
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/2181'"]
       interval: 10s
       timeout: 5s
       retries: 5
     command: >
-      bash -c "echo 1 > /var/lib/zookeeper/myid && /opt/zookeeper/bin/zkServer.sh start-foreground"
+      bash -c "mkdir -p /var/lib/zookeeper && echo 1 > /var/lib/zookeeper/myid && /opt/zookeeper/bin/zkServer.sh start-foreground"
 
   # ==================== MESSAGING LAYER ====================
   
   kafka:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/kafka/Dockerfile
     container_name: kafka
     hostname: kafka
     ports:
@@ -93,7 +93,7 @@ services:
   hadoop-namenode:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/hadoop/Dockerfile
     container_name: hadoop-namenode
     hostname: hadoop-namenode
     ports:
@@ -118,7 +118,7 @@ services:
   hadoop-datanode:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/hadoop/Dockerfile
     container_name: hadoop-datanode
     hostname: hadoop-datanode
     ports:
@@ -143,7 +143,7 @@ services:
   hadoop-resourcemanager:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/hadoop/Dockerfile
     container_name: hadoop-resourcemanager
     hostname: hadoop-resourcemanager
     ports:
@@ -170,7 +170,7 @@ services:
   hadoop-nodemanager:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/hadoop/Dockerfile
     container_name: hadoop-nodemanager
     hostname: hadoop-nodemanager
     ports:
@@ -192,7 +192,7 @@ services:
   hadoop-historyserver:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/hadoop/Dockerfile
     container_name: hadoop-historyserver
     hostname: hadoop-historyserver
     ports:
@@ -216,7 +216,7 @@ services:
   hbase-master:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/hbase/Dockerfile
     container_name: hbase-master
     hostname: hbase-master
     ports:
@@ -242,7 +242,7 @@ services:
   hbase-regionserver:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/hbase/Dockerfile
     container_name: hbase-regionserver
     hostname: hbase-regionserver
     ports:
@@ -268,7 +268,7 @@ services:
   hive-metastore:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/hive/Dockerfile
     container_name: hive-metastore
     hostname: hive-metastore
     ports:
@@ -293,7 +293,7 @@ services:
   hive-server:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/hive/Dockerfile
     container_name: hive-server
     hostname: hive-server
     ports:
@@ -320,7 +320,7 @@ services:
   spark-master:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/spark/Dockerfile
     container_name: spark-master
     hostname: spark-master
     ports:
@@ -343,7 +343,7 @@ services:
   spark-worker:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/spark/Dockerfile
     container_name: spark-worker
     hostname: spark-worker
     ports:
@@ -367,11 +367,11 @@ services:
   nifi:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/nifi/Dockerfile
     container_name: nifi
     hostname: nifi
     ports:
-      - "8080:8080"
+      - "8082:8080"
       - "8443:8443"
     environment:
       NIFI_HOME: /opt/nifi/current
@@ -394,7 +394,7 @@ services:
   flume:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/flume/Dockerfile
     container_name: flume
     hostname: flume
     ports:
@@ -417,7 +417,7 @@ services:
   sqoop:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/sqoop/Dockerfile
     container_name: sqoop
     hostname: sqoop
     environment:
@@ -435,7 +435,7 @@ services:
   oozie:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/oozie/Dockerfile
     container_name: oozie
     hostname: oozie
     ports:
@@ -459,7 +459,7 @@ services:
   mahout:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/mahout/Dockerfile
     container_name: mahout
     hostname: mahout
     environment:
@@ -477,7 +477,7 @@ services:
   pig:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: images/pig/Dockerfile
     container_name: pig
     hostname: pig
     environment:

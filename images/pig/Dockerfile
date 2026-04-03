@@ -24,6 +24,8 @@ RUN mkdir -p ${PIG_HOME}/logs \
 
 # Environment variables
 ENV PIG_HOME=/opt/pig
+ENV PATH=${PIG_HOME}/bin:${PATH}
+ENV JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
 
 WORKDIR /opt/pig
 

@@ -27,6 +27,8 @@ RUN mkdir -p ${SQOOP_HOME}/logs \
 
 # Environment variables
 ENV SQOOP_HOME=/opt/sqoop
+ENV PATH=${SQOOP_HOME}/bin:${PATH}
+ENV JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
 
 WORKDIR /opt/sqoop
 

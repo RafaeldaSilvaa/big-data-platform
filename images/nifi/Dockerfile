@@ -35,6 +35,8 @@ COPY config/nifi/* ${NIFI_CONF_DIR}/
 # Environment variables
 ENV NIFI_HOME=/opt/nifi/current
 ENV NIFI_LOG_DIR=${NIFI_HOME}/logs
+ENV PATH=${NIFI_HOME}/bin:${PATH}
+ENV JAVA_HOME=/usr/lib/jvm/temurin-11-jdk-amd64
 
 # Expose ports
 EXPOSE 8443 8080 8081 8443

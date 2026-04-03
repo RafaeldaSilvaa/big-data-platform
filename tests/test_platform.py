@@ -7,6 +7,24 @@ import os
 import xml.etree.ElementTree as ET
 import pytest
 import yaml
+import subprocess
+import json
+
+
+def run_docker_command(image, command, timeout=30):
+    """Run a command in a Docker container and return the result"""
+    try:
+        result = subprocess.run(
+            ['docker', 'run', '--rm', image, 'bash', '-c', command],
+            capture_output=True,
+            text=True,
+            timeout=timeout
+        )
+        return result.returncode, result.stdout, result.stderr
+    except subprocess.TimeoutExpired:
+        return 1, '', 'Command timed out'
+    except Exception as e:
+        return 1, '', str(e)
 
 
 class TestConfiguration:
@@ -209,6 +227,173 @@ class TestFrontend:
         """Test App.jsx exists"""
         path = 'frontend/src/App.jsx'
         assert os.path.exists(path), f"Missing {path}"
+
+
+class TestDockerImages:
+    """Test Docker images are functional and can execute expected commands"""
+    
+    def test_spark_image_spark_submit(self):
+        """Test Spark image can execute spark-submit"""
+        returncode, stdout, stderr = run_docker_command(
+            'bigdata-platform-spark:latest',
+            'spark-submit --version'
+        )
+        assert returncode == 0, f"Failed to run spark-submit: {stderr}"
+        assert 'spark' in stdout.lower() or 'warning' in stderr.lower(), \
+            f"spark-submit output unexpected: stdout={stdout}, stderr={stderr}"
+    
+    def test_spark_image_python(self):
+        """Test Spark image has Python available"""
+        returncode, stdout, stderr = run_docker_command(
+            'bigdata-platform-spark:latest',
+            'python3 --version'
+        )
+        assert returncode == 0, f"Failed to run python3: {stderr}"
+        assert 'python' in stdout.lower(), f"python3 version output unexpected: {stdout}"
+    
+    def test_hive_image_hive_cli(self):
+        """Test Hive image can execute hive CLI"""
+        returncode, stdout, stderr = run_docker_command(
+            'bigdata-platform-hive:latest',
+            'hive --version',
+            timeout=60
+        )
+        assert returncode == 0, f"Failed to run hive: {stderr}"
+        assert 'hive' in stdout.lower() or 'version' in stdout.lower(), \
+            f"hive version output unexpected: {stdout}"
+    
+    def test_hive_image_java_home(self):
+        """Test Hive image has proper JAVA_HOME"""
+        returncode, stdout, stderr = run_docker_command(
+            'bigdata-platform-hive:latest',
+            'echo $JAVA_HOME'
+        )
+        assert returncode == 0, f"Failed to get JAVA_HOME: {stderr}"
+        java_home = stdout.strip()
+        assert java_home, f"JAVA_HOME is empty"
+        assert '/usr/lib/jvm' in java_home, f"JAVA_HOME does not contain /usr/lib/jvm: {java_home}"
+    
+    def test_hbase_image_hbase_command(self):
+        """Test HBase image can execute hbase command"""
+        returncode, stdout, stderr = run_docker_command(
+            'bigdata-platform-hbase:latest',
+            'hbase version',
+            timeout=60
+        )
+        assert returncode == 0, f"Failed to run hbase: {stderr}"
+        # HBase version command may output to stderr
+        output = stdout + stderr
+        assert 'hbase' in output.lower(), f"hbase version output unexpected: {output}"
+    
+    def test_kafka_image_kafka_topics(self):
+        """Test Kafka image can execute kafka-topics.sh"""
+        returncode, stdout, stderr = run_docker_command(
+            'bigdata-platform-kafka:latest',
+            'kafka-topics.sh --help',
+            timeout=30
+        )
+        assert returncode == 0, f"Failed to run kafka-topics.sh: {stderr}"
+        output = stdout + stderr
+        assert 'topic' in output.lower(), f"kafka-topics help output unexpected: {output}"
+    
+    def test_kafka_image_kafka_console(self):
+        """Test Kafka image has console tools available"""
+        returncode, stdout, stderr = run_docker_command(
+            'bigdata-platform-kafka:latest',
+            'ls /opt/kafka/bin/ | grep console'
+        )
+        assert returncode == 0, f"Failed to list kafka console tools: {stderr}"
+        output = stdout.strip()
+        assert output, f"No kafka console tools found"
+    
+    def test_zookeeper_image_zkserver(self):
+        """Test ZooKeeper image can execute zkServer.sh"""
+        returncode, stdout, stderr = run_docker_command(
+            'bigdata-platform-zookeeper:latest',
+            'zkServer.sh help',
+            timeout=30
+        )
+        # zkServer.sh help exits with code 1 but still shows help
+        assert returncode in [0, 1], f"Unexpected return code from zkServer.sh: {returncode}"
+        output = stdout + stderr
+        assert 'zookeeper' in output.lower() or 'usage' in output.lower(), \
+            f"zkServer.sh help output unexpected: {output}"
+    
+    def test_zookeeper_image_java_home(self):
+        """Test ZooKeeper image has proper JAVA_HOME"""
+        returncode, stdout, stderr = run_docker_command(
+            'bigdata-platform-zookeeper:latest',
+            'echo $JAVA_HOME'
+        )
+        assert returncode == 0, f"Failed to get JAVA_HOME: {stderr}"
+        java_home = stdout.strip()
+        assert java_home, f"JAVA_HOME is empty"
+        assert '/usr/lib/jvm' in java_home, f"JAVA_HOME does not contain /usr/lib/jvm: {java_home}"
+    
+    def test_flume_image_flume_cli(self):
+        """Test Flume image can execute flume-ng"""
+        returncode, stdout, stderr = run_docker_command(
+            'bigdata-platform-flume:latest',
+            'flume-ng version',
+            timeout=30
+        )
+        assert returncode == 0, f"Failed to run flume-ng: {stderr}"
+        output = stdout + stderr
+        assert 'flume' in output.lower() or 'version' in output.lower(), \
+            f"flume-ng version output unexpected: {output}"
+    
+    def test_sqoop_image_sqoop_cli(self):
+        """Test Sqoop image can execute sqoop"""
+        returncode, stdout, stderr = run_docker_command(
+            'bigdata-platform-sqoop:latest',
+            'sqoop version',
+            timeout=30
+        )
+        assert returncode == 0, f"Failed to run sqoop: {stderr}"
+        output = stdout + stderr
+        assert 'sqoop' in output.lower() or 'version' in output.lower(), \
+            f"sqoop version output unexpected: {output}"
+    
+    def test_nifi_image_nifi_cli(self):
+        """Test NiFi image can access nifi-toolkit"""
+        returncode, stdout, stderr = run_docker_command(
+            'bigdata-platform-nifi:latest',
+            'ls /opt/nifi/current/bin/nifi.sh',
+            timeout=30
+        )
+        assert returncode == 0, f"Failed to find nifi.sh: {stderr}"
+    
+    def test_pig_image_pig_cli(self):
+        """Test Pig image can execute pig"""
+        returncode, stdout, stderr = run_docker_command(
+            'bigdata-platform-pig:latest',
+            'pig -version',
+            timeout=30
+        )
+        assert returncode == 0, f"Failed to run pig: {stderr}"
+        output = stdout + stderr
+        assert 'pig' in output.lower() or 'apache' in output.lower(), \
+            f"pig version output unexpected: {output}"
+    
+    def test_oozie_image_oozie_cli(self):
+        """Test Oozie image can access oozie"""
+        returncode, stdout, stderr = run_docker_command(
+            'bigdata-platform-oozie:latest',
+            'ls /opt/oozie/bin/oozie',
+            timeout=30
+        )
+        assert returncode == 0, f"Failed to find oozie: {stderr}"
+    
+    def test_mahout_image_exists(self):
+        """Test Mahout image is properly configured"""
+        returncode, stdout, stderr = run_docker_command(
+            'bigdata-platform-mahout:latest',
+            'ls /opt/mahout/bin',
+            timeout=30
+        )
+        assert returncode == 0, f"Failed to list mahout bin: {stderr}"
+        output = stdout.strip()
+        assert output, f"mahout bin directory is empty"
 
 
 if __name__ == '__main__':
