@@ -393,10 +393,34 @@ docker exec -it spark-master \
 
 ## 🌐 Web Interfaces
 
-Access the following web UIs:
+### Frontend Dashboard (React Application)
+
+The platform includes a modern **React-based dashboard** for monitoring and interacting with all Big Data services.
+
+```bash
+# Install dependencies
+cd frontend
+npm install
+
+# Start development server
+npm run dev
+```
+
+**Access the frontend at:** http://localhost:3000
+
+The dashboard provides:
+- **Dashboard**: Real-time metrics, resource utilization charts, service health
+- **HDFS Explorer**: Browse, create, and manage HDFS files and directories
+- **Kafka Manager**: Create/delete topics, view messages, monitor throughput
+- **Spark Jobs**: Submit jobs, monitor running jobs, view history
+- **Hive Queries**: Query editor with templates, database/table browser
+- **Service Status**: Real-time status of all platform services
+
+### Backend Services Web UIs
 
 | Service | URL | Credentials |
 |---------|-----|-------------|
+| **Frontend Dashboard** | http://localhost:3000 | No auth |
 | HDFS UI | http://localhost:9870 | No auth |
 | YARN UI | http://localhost:8088 | No auth |
 | Spark Master | http://localhost:8080 | No auth |
@@ -405,6 +429,20 @@ Access the following web UIs:
 | HBase UI | http://localhost:16010 | No auth |
 | Oozie UI | http://localhost:11000 | admin/admin |
 
+### Quick Access Commands
+
+```bash
+# Open all web UIs in browser (Linux)
+xdg-open http://localhost:3000  # Frontend
+xdg-open http://localhost:9870  # HDFS
+xdg-open http://localhost:8088  # YARN
+xdg-open http://localhost:8080  # Spark
+
+# Or use curl to verify services
+curl -I http://localhost:3000  # Frontend
+curl -I http://localhost:9870  # HDFS
+curl -I http://localhost:8088  # YARN
+```
 ## 🔍 Troubleshooting
 
 ### Common Issues
