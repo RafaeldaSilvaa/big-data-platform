@@ -111,3 +111,36 @@ jobs:
 
       - name: Test Docker Compose
         run: docker compose config --services
+
+      - name: Test base image
+        run: docker run --rm bigdata-platform-base:latest java -version 2>&1 | head -1
+
+      - name: Test Hadoop image
+        run: docker run --rm bigdata-platform-hadoop:latest hadoop version 2>&1 | head -1
+
+      - name: Test Spark image
+        run: docker run --rm bigdata-platform-spark:latest spark-submit --version 2>&1 | head -1
+
+      - name: Test Hive image  
+        run: docker run --rm bigdata-platform-hive:latest hive --version 2>&1 | head -1
+
+      - name: Test HBase image
+        run: docker run --rm bigdata-platform-hbase:latest hbase version 2>&1 | head -1
+
+      - name: Test Kafka image
+        run: docker run --rm bigdata-platform-kafka:latest kafka-topics.sh --version 2>&1 | head -1 || docker run --rm bigdata-platform-kafka:latest kafka-broker-api-versions.sh --version 2>&1 | head -1
+
+      - name: Test ZooKeeper image
+        run: docker run --rm bigdata-platform-zookeeper:latest zkServer.sh version 2>&1 | head -1
+
+      - name: Test NiFi image
+        run: docker run --rm bigdata-platform-nifi:latest nifi --version 2>&1 | head -1
+
+      - name: Test Sqoop image
+        run: docker run --rm bigdata-platform-sqoop:latest sqoop version 2>&1 | head -1
+
+      - name: Test Oozie image
+        run: docker run --rm bigdata-platform-oozie:latest oozie version 2>&1 | head -1
+
+      - name: Test Pig image
+        run: docker run --rm bigdata-platform-pig:latest pig --version 2>&1 | head -1
