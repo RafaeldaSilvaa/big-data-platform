@@ -174,7 +174,36 @@ This is a complete **End-to-End Big Data Platform** designed for enterprise data
 - 50GB Disk Space
 ```
 
-### Installation
+### Installation (Linux/Mac)
+
+```bash
+# 1. Clone or navigate to the project
+cd big-data-platform
+
+# 2. Make startup script executable
+chmod +x start-platform.sh
+
+# 3. Start the platform (builds images and starts services)
+./start-platform.sh --build
+
+# Or start without building
+./start-platform.sh
+```
+
+### Installation (Windows)
+
+```batch
+:: 1. Navigate to the project
+cd big-data-platform
+
+:: 2. Start the platform (builds images and starts services)
+start-platform.bat --build
+
+:: Or start without building
+start-platform.bat
+```
+
+### Manual Installation (All Platforms)
 
 ```bash
 # 1. Clone or navigate to the project
