@@ -120,7 +120,7 @@ jobs:
         run: docker run --rm ${{ matrix.tag }} which java
 
       - name: Test ${{ matrix.name }} Image - JAVA_HOME set
-        run: docker run --rm ${{ matrix.tag }} bash -c "test -n $JAVA_HOME"
+        run: docker run --rm ${{ matrix.tag }} bash -c "test -n \$JAVA_HOME"
 
       - name: Test ${{ matrix.name }} Image - Services available
         run: |
