@@ -58,10 +58,10 @@ jobs:
         run: cd frontend && npm install --legacy-peer-deps
 
       - name: Run lint
-        run: cd frontend && npm run lint || true
+        run: cd frontend && npx eslint src --ext .js,.jsx || true
 
-  build-images:
-    name: Build Docker Images
+  build-base:
+    name: Build Base Image
     runs-on: ubuntu-latest
     needs: validate
     steps:
@@ -72,16 +72,44 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build Base Image
-        run: docker build -t bigdata-platform:base images/base
+        run: docker build -t bigdata-platform-base:latest images/base
+
+      - name: Push Base Image
+        run: docker push bigdata-platform-base:latest
+
+  build-hadoop:
+    name: Build Hadoop Image
+    runs-on: ubuntu-latest
+    needs: build-base
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
 
       - name: Build Hadoop Image
-        run: docker build -t bigdata-platform:hadoop images/hadoop
+        run: docker build -t bigdata-platform-hadoop:latest images/hadoop
 
-      - name: Build Spark Image
-        run: docker build -t bigdata-platform:spark images/spark
+      - name: Push Hadoop Image
+        run: docker push bigdata-platform-hadoop:latest
 
-      - name: Build Hive Image
-        run: docker build -t bigdata-platform:hive images/hive
+  build-images:
+    name: Build Remaining Images
+    runs-on: ubuntu-latest
+    needs: build-hadoop
+    strategy:
+      matrix:
+        image: [spark, hive, hbase, kafka, zookeeper, nifi, flume, sqoop, oozie, mahout, pig]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build ${{ matrix.image }} Image
+        run: docker build -t bigdata-platform-${{ matrix.image }}:latest images/${{ matrix.image }}
 
       - name: List images
         run: docker images | grep bigdata-platform
