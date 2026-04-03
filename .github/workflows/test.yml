@@ -27,13 +27,12 @@ jobs:
 
       - name: Validate docker-compose.yml
         run: |
-          cd big-data-platform
-          docker compose config --quiet
+                    docker compose config --quiet
           echo "✓ Docker Compose configuration is valid"
 
       - name: Check Dockerfiles exist
         run: |
-          cd big-data-platform/images
+          cd images
           for dir in */; do
             if [ ! -f "${dir}Dockerfile" ]; then
               echo "ERROR: Missing Dockerfile in ${dir}"
@@ -44,7 +43,7 @@ jobs:
 
       - name: Validate shell scripts
         run: |
-          cd big-data-platform/scripts
+          cd scripts
           for script in *.sh; do
             bash -n "$script" || { echo "Syntax error in $script"; exit 1; }
           done
@@ -52,8 +51,7 @@ jobs:
 
       - name: Validate XML configuration files
         run: |
-          cd big-data-platform
-          python3 -c "
+                    python3 -c "
           import xml.etree.ElementTree as ET
           configs = [
               'config/hadoop/core-site.xml',
@@ -70,8 +68,7 @@ jobs:
 
       - name: Validate Python scripts
         run: |
-          cd big-data-platform
-          python3 -m py_compile apps/spark/streaming_pipeline.py
+                    python3 -m py_compile apps/spark/streaming_pipeline.py
           python3 -m py_compile apps/spark/write_hbase.py
           echo "✓ Python scripts are valid"
 
@@ -95,17 +92,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd big-data-platform/frontend
+          cd frontend
           npm ci --legacy-peer-deps
 
       - name: Lint frontend code
         run: |
-          cd big-data-platform/frontend
+          cd frontend
           npm run lint || true
 
       - name: Build frontend
         run: |
-          cd big-data-platform/frontend
+          cd frontend
           npm run build
 
       - name: Upload build artifacts
@@ -132,22 +129,22 @@ jobs:
 
       - name: Build base image (dry run validation)
         run: |
-          cd big-data-platform/images/base
+          cd images/base
           docker build --dry-run . || echo "Base image build validation complete"
 
       - name: Build Hadoop image (dry run validation)
         run: |
-          cd big-data-platform/images/hadoop
+          cd images/hadoop
           docker build --dry-run . || echo "Hadoop image build validation complete"
 
       - name: Build Spark image (dry run validation)
         run: |
-          cd big-data-platform/images/spark
+          cd images/spark
           docker build --dry-run . || echo "Spark image build validation complete"
 
       - name: Build Hive image (dry run validation)
         run: |
-          cd big-data-platform/images/hive
+          cd images/hive
           docker build --dry-run . || echo "Hive image build validation complete"
 
   # ============================================
