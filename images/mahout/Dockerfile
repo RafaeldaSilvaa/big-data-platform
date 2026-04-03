@@ -8,14 +8,14 @@ LABEL description="Apache Mahout"
 
 # Mahout version
 ENV MAHOUT_VERSION=0.13.1
-ENV MAHOUT_HOME=/opt/apache-mahout-${MAHOUT_VERSION}-bin
+ENV MAHOUT_HOME=/opt/mahout
 ENV MAHOUT_CONF_DIR=${MAHOUT_HOME}/conf
 
 # Install Mahout
-RUN wget -q https://archive.apache.org/dist/mahout/${MAHOUT_VERSION}/apache-mahout-${MAHOUT_VERSION}-bin.tar.gz && \
-    tar -xzf apache-mahout-${MAHOUT_VERSION}-bin.tar.gz -C /opt/ && \
-    rm apache-mahout-${MAHOUT_VERSION}-bin.tar.gz && \
-    ln -s /opt/apache-mahout-${MAHOUT_VERSION}-bin /opt/mahout
+RUN wget -q https://archive.apache.org/dist/mahout/${MAHOUT_VERSION}/apache-mahout-distribution-${MAHOUT_VERSION}.tar.gz && \
+    tar -xzf apache-mahout-distribution-${MAHOUT_VERSION}.tar.gz -C /opt/ && \
+    rm apache-mahout-distribution-${MAHOUT_VERSION}.tar.gz && \
+    ln -s /opt/apache-mahout-distribution-${MAHOUT_VERSION} /opt/mahout
 
 # Create directories
 RUN mkdir -p ${MAHOUT_HOME}/logs \
