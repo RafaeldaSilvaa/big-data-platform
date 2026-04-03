@@ -194,4 +194,3 @@ jobs:
 
       - name: Run Docker image functional tests
         run: python -m pytest tests/test_platform.py::TestDockerImages -v --tb=short
-        run: python -m pytest tests/test_platform.py::TestDockerImages -v --tb=short
