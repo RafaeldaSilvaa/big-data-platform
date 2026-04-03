@@ -1,0 +1,30 @@
+# Big Data Platform - Apache Mahout Image
+# Mahout for machine learning
+
+FROM bigdata-platform-hadoop:latest
+
+LABEL maintainer="Big Data Platform Team"
+LABEL description="Apache Mahout"
+
+# Mahout version
+ENV MAHOUT_VERSION=0.13.1
+ENV MAHOUT_HOME=/opt/apache-mahout-${MAHOUT_VERSION}-bin
+ENV MAHOUT_CONF_DIR=${MAHOUT_HOME}/conf
+
+# Install Mahout
+RUN wget -q https://archive.apache.org/dist/mahout/${MAHOUT_VERSION}/apache-mahout-${MAHOUT_VERSION}-bin.tar.gz && \
+    tar -xzf apache-mahout-${MAHOUT_VERSION}-bin.tar.gz -C /opt/ && \
+    rm apache-mahout-${MAHOUT_VERSION}-bin.tar.gz && \
+    ln -s /opt/apache-mahout-${MAHOUT_VERSION}-bin /opt/mahout
+
+# Create directories
+RUN mkdir -p ${MAHOUT_HOME}/logs \
+    /mahout-data \
+    && chown -R hadoop:hadoop /opt/mahout /mahout-data
+
+# Environment variables
+ENV MAHOUT_HOME=/opt/mahout
+
+WORKDIR /opt/mahout
+
+CMD ["/bin/bash"]

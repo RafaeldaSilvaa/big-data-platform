@@ -1,0 +1,541 @@
+# Big Data Platform Docker Compose
+# Complete End-to-End Data Platform with Apache Ecosystem
+
+services:
+  # ==================== COORDINATION LAYER ====================
+  
+  zookeeper:
+    build:
+      context: ./images/zookeeper
+      dockerfile: Dockerfile
+    container_name: zookeeper
+    hostname: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_HOME: /opt/zookeeper
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper
+      - zookeeper-logs:/var/log/zookeeper
+    networks:
+      - bigdata-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: >
+      bash -c "echo 1 > /var/lib/zookeeper/myid && /opt/zookeeper/bin/zkServer.sh start-foreground"
+
+  # ==================== MESSAGING LAYER ====================
+  
+  kafka:
+    build:
+      context: ./images/kafka
+      dockerfile: Dockerfile
+    container_name: kafka
+    hostname: kafka
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 0
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_LOG_DIRS: /var/lib/kafka/logs
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+    volumes:
+      - kafka-data:/var/lib/kafka
+    networks:
+      - bigdata-network
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  # ==================== DATABASE LAYER (Metastore) ====================
+  
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    hostname: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: hivemetastore
+      POSTGRES_USER: hive
+      POSTGRES_PASSWORD: hive
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - bigdata-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hive -d hivemetastore"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==================== STORAGE LAYER ====================
+  
+  hadoop-namenode:
+    build:
+      context: ./images/hadoop
+      dockerfile: Dockerfile
+    container_name: hadoop-namenode
+    hostname: hadoop-namenode
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+    environment:
+      HADOOP_HOME: /opt/hadoop
+      HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
+      CORE_SITE_XML: /opt/hadoop/etc/hadoop/core-site.xml
+      HDFS_SITE_XML: /opt/hadoop/etc/hadoop/hdfs-site.xml
+    volumes:
+      - hadoop-namenode-data:/hadoop/hdfs/namenode
+      - hadoop-config:/opt/hadoop/etc/hadoop
+    networks:
+      - bigdata-network
+    command: >
+      bash -c "export HADOOP_HOME=/opt/hadoop && 
+               export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop &&
+               /opt/hadoop/bin/hdfs namenode -format -force &&
+               /opt/hadoop/bin/hdfs namenode"
+
+  hadoop-datanode:
+    build:
+      context: ./images/hadoop
+      dockerfile: Dockerfile
+    container_name: hadoop-datanode
+    hostname: hadoop-datanode
+    ports:
+      - "9864:9864"
+      - "9866:9866"
+      - "9867:9867"
+    environment:
+      HADOOP_HOME: /opt/hadoop
+      HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
+    volumes:
+      - hadoop-datanode-data:/hadoop/hdfs/datanode
+      - hadoop-config:/opt/hadoop/etc/hadoop
+    networks:
+      - bigdata-network
+    depends_on:
+      - hadoop-namenode
+    command: >
+      bash -c "export HADOOP_HOME=/opt/hadoop && 
+               export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop &&
+               /opt/hadoop/bin/hdfs datanode"
+
+  hadoop-resourcemanager:
+    build:
+      context: ./images/hadoop
+      dockerfile: Dockerfile
+    container_name: hadoop-resourcemanager
+    hostname: hadoop-resourcemanager
+    ports:
+      - "8088:8088"
+      - "8030:8030"
+      - "8031:8031"
+      - "8032:8032"
+      - "8033:8033"
+    environment:
+      HADOOP_HOME: /opt/hadoop
+      YARN_CONF_DIR: /opt/hadoop/etc/hadoop
+    volumes:
+      - hadoop-config:/opt/hadoop/etc/hadoop
+    networks:
+      - bigdata-network
+    depends_on:
+      - hadoop-namenode
+      - hadoop-datanode
+    command: >
+      bash -c "export HADOOP_HOME=/opt/hadoop && 
+               export YARN_CONF_DIR=/opt/hadoop/etc/hadoop &&
+               /opt/hadoop/bin/yarn resourcemanager"
+
+  hadoop-nodemanager:
+    build:
+      context: ./images/hadoop
+      dockerfile: Dockerfile
+    container_name: hadoop-nodemanager
+    hostname: hadoop-nodemanager
+    ports:
+      - "8042:8042"
+    environment:
+      HADOOP_HOME: /opt/hadoop
+      YARN_CONF_DIR: /opt/hadoop/etc/hadoop
+    volumes:
+      - hadoop-config:/opt/hadoop/etc/hadoop
+    networks:
+      - bigdata-network
+    depends_on:
+      - hadoop-resourcemanager
+    command: >
+      bash -c "export HADOOP_HOME=/opt/hadoop && 
+               export YARN_CONF_DIR=/opt/hadoop/etc/hadoop &&
+               /opt/hadoop/bin/yarn nodemanager"
+
+  hadoop-historyserver:
+    build:
+      context: ./images/hadoop
+      dockerfile: Dockerfile
+    container_name: hadoop-historyserver
+    hostname: hadoop-historyserver
+    ports:
+      - "19888:19888"
+    environment:
+      HADOOP_HOME: /opt/hadoop
+      YARN_CONF_DIR: /opt/hadoop/etc/hadoop
+    volumes:
+      - hadoop-config:/opt/hadoop/etc/hadoop
+    networks:
+      - bigdata-network
+    depends_on:
+      - hadoop-resourcemanager
+    command: >
+      bash -c "export HADOOP_HOME=/opt/hadoop && 
+               export YARN_CONF_DIR=/opt/hadoop/etc/hadoop &&
+               /opt/hadoop/bin/mapred historyserver"
+
+  # ==================== NOSQL LAYER ====================
+  
+  hbase-master:
+    build:
+      context: ./images/hbase
+      dockerfile: Dockerfile
+    container_name: hbase-master
+    hostname: hbase-master
+    ports:
+      - "16000:16000"
+      - "16010:16010"
+    environment:
+      HBASE_HOME: /opt/hbase
+      HBASE_CONF_DIR: /opt/hbase/conf
+      HBASE_MANAGER: hbase-master
+    volumes:
+      - hbase-data:/hbase-data
+      - hbase-config:/opt/hbase/conf
+    networks:
+      - bigdata-network
+    depends_on:
+      - zookeeper
+      - hadoop-namenode
+    command: >
+      bash -c "export HBASE_HOME=/opt/hbase && 
+               export HBASE_CONF_DIR=/opt/hbase/conf &&
+               /opt/hbase/bin/hbase master start"
+
+  hbase-regionserver:
+    build:
+      context: ./images/hbase
+      dockerfile: Dockerfile
+    container_name: hbase-regionserver
+    hostname: hbase-regionserver
+    ports:
+      - "16030:16030"
+    environment:
+      HBASE_HOME: /opt/hbase
+      HBASE_CONF_DIR: /opt/hbase/conf
+      HBASE_REGIONSERVER: hbase-regionserver
+    volumes:
+      - hbase-data:/hbase-data
+      - hbase-config:/opt/hbase/conf
+    networks:
+      - bigdata-network
+    depends_on:
+      - hbase-master
+    command: >
+      bash -c "export HBASE_HOME=/opt/hbase && 
+               export HBASE_CONF_DIR=/opt/hbase/conf &&
+               /opt/hbase/bin/hbase regionserver start"
+
+  # ==================== QUERY/METADATA LAYER ====================
+  
+  hive-metastore:
+    build:
+      context: ./images/hive
+      dockerfile: Dockerfile
+    container_name: hive-metastore
+    hostname: hive-metastore
+    ports:
+      - "9083:9083"
+    environment:
+      HIVE_HOME: /opt/hive
+      HIVE_CONF_DIR: /opt/hive/conf
+      SERVICE_NAME: metastore
+    volumes:
+      - hive-config:/opt/hive/conf
+      - hive-warehouse:/warehouse
+    networks:
+      - bigdata-network
+    depends_on:
+      - postgres
+      - hadoop-namenode
+    command: >
+      bash -c "export HIVE_HOME=/opt/hive && 
+               export HIVE_CONF_DIR=/opt/hive/conf &&
+               /opt/hive/bin/hive --service metastore"
+
+  hive-server:
+    build:
+      context: ./images/hive
+      dockerfile: Dockerfile
+    container_name: hive-server
+    hostname: hive-server
+    ports:
+      - "10000:10000"
+      - "10002:10002"
+    environment:
+      HIVE_HOME: /opt/hive
+      HIVE_CONF_DIR: /opt/hive/conf
+      SERVICE_NAME: hiveserver2
+    volumes:
+      - hive-config:/opt/hive/conf
+      - hive-warehouse:/warehouse
+    networks:
+      - bigdata-network
+    depends_on:
+      - hive-metastore
+    command: >
+      bash -c "export HIVE_HOME=/opt/hive && 
+               export HIVE_CONF_DIR=/opt/hive/conf &&
+               /opt/hive/bin/hive --service hiveserver2"
+
+  # ==================== PROCESSING LAYER ====================
+  
+  spark-master:
+    build:
+      context: ./images/spark
+      dockerfile: Dockerfile
+    container_name: spark-master
+    hostname: spark-master
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    environment:
+      SPARK_HOME: /opt/spark
+      SPARK_MASTER_HOST: spark-master
+    volumes:
+      - spark-config:/opt/spark/conf
+    networks:
+      - bigdata-network
+    depends_on:
+      - hadoop-namenode
+      - hadoop-datanode
+    command: >
+      bash -c "export SPARK_HOME=/opt/spark &&
+               /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master"
+
+  spark-worker:
+    build:
+      context: ./images/spark
+      dockerfile: Dockerfile
+    container_name: spark-worker
+    hostname: spark-worker
+    ports:
+      - "8081:8081"
+    environment:
+      SPARK_HOME: /opt/spark
+      SPARK_MASTER: spark://spark-master:7077
+      SPARK_WORKER_WEBUI_PORT: 8081
+    volumes:
+      - spark-config:/opt/spark/conf
+    networks:
+      - bigdata-network
+    depends_on:
+      - spark-master
+    command: >
+      bash -c "export SPARK_HOME=/opt/spark &&
+               /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077"
+
+  # ==================== INGESTION LAYER ====================
+  
+  nifi:
+    build:
+      context: ./images/nifi
+      dockerfile: Dockerfile
+    container_name: nifi
+    hostname: nifi
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    environment:
+      NIFI_HOME: /opt/nifi/current
+    volumes:
+      - nifi-data:/data/nifi
+      - nifi-flowfiles:/flowfile_repository
+      - nifi-content:/content_repository
+      - nifi-provenance:/provenance_repository
+    networks:
+      - bigdata-network
+    depends_on:
+      - zookeeper
+      - kafka
+    command: >
+      bash -c "export NIFI_HOME=/opt/nifi/current && 
+               /opt/nifi/current/bin/nifi.sh run"
+
+  # ==================== ADDITIONAL SERVICES ====================
+  
+  flume:
+    build:
+      context: ./images/flume
+      dockerfile: Dockerfile
+    container_name: flume
+    hostname: flume
+    ports:
+      - "41414:41414"
+      - "4141:4141"
+    environment:
+      FLUME_HOME: /opt/flume
+      FLUME_CONF_DIR: /opt/flume/conf
+    volumes:
+      - flume-logs:/var/log/flume
+    networks:
+      - bigdata-network
+    depends_on:
+      - hadoop-namenode
+      - kafka
+    command: >
+      bash -c "export FLUME_HOME=/opt/flume && 
+               /opt/flume/bin/flume-ng agent -c /opt/flume/conf -f /opt/flume/conf/flume.conf -n agent"
+
+  sqoop:
+    build:
+      context: ./images/sqoop
+      dockerfile: Dockerfile
+    container_name: sqoop
+    hostname: sqoop
+    environment:
+      SQOOP_HOME: /opt/sqoop
+      HADOOP_HOME: /opt/hadoop
+    volumes:
+      - sqoop-data:/var/lib/sqoop
+    networks:
+      - bigdata-network
+    depends_on:
+      - hadoop-namenode
+      - postgres
+    command: /bin/bash -c "tail -f /dev/null"
+
+  oozie:
+    build:
+      context: ./images/oozie
+      dockerfile: Dockerfile
+    container_name: oozie
+    hostname: oozie
+    ports:
+      - "11000:11000"
+      - "11001:11001"
+    environment:
+      OOZIE_HOME: /opt/oozie
+      OOZIE_URL: http://oozie:11000/oozie
+    volumes:
+      - oozie-data:/oozie-data
+      - oozie-tmp:/oozie/tmp
+    networks:
+      - bigdata-network
+    depends_on:
+      - hadoop-namenode
+      - hive-metastore
+    command: >
+      bash -c "export OOZIE_HOME=/opt/oozie && 
+               /opt/oozie/bin/oozie-start.sh"
+
+  mahout:
+    build:
+      context: ./images/mahout
+      dockerfile: Dockerfile
+    container_name: mahout
+    hostname: mahout
+    environment:
+      MAHOUT_HOME: /opt/mahout
+      HADOOP_HOME: /opt/hadoop
+    volumes:
+      - mahout-data:/mahout-data
+    networks:
+      - bigdata-network
+    depends_on:
+      - hadoop-namenode
+      - spark-master
+    command: /bin/bash -c "tail -f /dev/null"
+
+  pig:
+    build:
+      context: ./images/pig
+      dockerfile: Dockerfile
+    container_name: pig
+    hostname: pig
+    environment:
+      PIG_HOME: /opt/pig
+      HADOOP_HOME: /opt/hadoop
+    volumes:
+      - pig-data:/pig-data
+    networks:
+      - bigdata-network
+    depends_on:
+      - hadoop-namenode
+    command: /bin/bash -c "tail -f /dev/null"
+
+# ==================== NETWORKS ====================
+
+networks:
+  bigdata-network:
+    driver: bridge
+
+# ==================== VOLUMES ====================
+
+volumes:
+  # ZooKeeper
+  zookeeper-data:
+  zookeeper-logs:
+  
+  # Kafka
+  kafka-data:
+  
+  # PostgreSQL
+  postgres-data:
+  
+  # Hadoop HDFS
+  hadoop-namenode-data:
+  hadoop-datanode-data:
+  hadoop-config:
+  
+  # HBase
+  hbase-data:
+  hbase-config:
+  
+  # Hive
+  hive-config:
+  hive-warehouse:
+  
+  # Spark
+  spark-config:
+  
+  # NiFi
+  nifi-data:
+  nifi-flowfiles:
+  nifi-content:
+  nifi-provenance:
+  
+  # Additional
+  flume-logs:
+  sqoop-data:
+  oozie-data:
+  oozie-tmp:
+  mahout-data:
+  pig-data:
