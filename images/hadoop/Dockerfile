@@ -31,7 +31,7 @@ RUN mkdir -p ${HADOOP_HOME}/logs \
     && chown -R hadoop:hadoop /hadoop /opt/hadoop
 
 # Copy configuration files
-COPY ../../config/hadoop/* ${HADOOP_CONF_DIR}/
+COPY config/hadoop/* ${HADOOP_CONF_DIR}/
 
 # Environment variables
 ENV HADOOP_LOG_DIR=/var/log/hadoop

@@ -24,7 +24,7 @@ RUN mkdir -p ${SPARK_HOME}/logs \
     && chown -R hadoop:hadoop /opt/spark /var/log/spark
 
 # Copy Spark configuration
-COPY ../../config/spark/* ${SPARK_CONF_DIR}/
+COPY config/spark/* ${SPARK_CONF_DIR}/
 
 # Environment variables
 ENV SPARK_LOG_DIR=/var/log/spark

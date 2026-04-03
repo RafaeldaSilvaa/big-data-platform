@@ -25,7 +25,7 @@ RUN mkdir -p ${HBASE_HOME}/logs \
     && chown -R hadoop:hadoop /opt/hbase /hbase-data /hbase/logs /hbase/tmp
 
 # Copy configuration
-COPY ../../config/hbase/* ${HBASE_CONF_DIR}/
+COPY config/hbase/* ${HBASE_CONF_DIR}/
 
 # Environment variables
 ENV HBASE_LOG_DIR=/hbase/logs

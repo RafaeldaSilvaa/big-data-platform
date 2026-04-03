@@ -6,7 +6,7 @@ services:
   
   zookeeper:
     build:
-      context: ./images/zookeeper
+      context: .
       dockerfile: Dockerfile
     container_name: zookeeper
     hostname: zookeeper
@@ -33,7 +33,7 @@ services:
   
   kafka:
     build:
-      context: ./images/kafka
+      context: .
       dockerfile: Dockerfile
     container_name: kafka
     hostname: kafka
@@ -92,7 +92,7 @@ services:
   
   hadoop-namenode:
     build:
-      context: ./images/hadoop
+      context: .
       dockerfile: Dockerfile
     container_name: hadoop-namenode
     hostname: hadoop-namenode
@@ -117,7 +117,7 @@ services:
 
   hadoop-datanode:
     build:
-      context: ./images/hadoop
+      context: .
       dockerfile: Dockerfile
     container_name: hadoop-datanode
     hostname: hadoop-datanode
@@ -142,7 +142,7 @@ services:
 
   hadoop-resourcemanager:
     build:
-      context: ./images/hadoop
+      context: .
       dockerfile: Dockerfile
     container_name: hadoop-resourcemanager
     hostname: hadoop-resourcemanager
@@ -169,7 +169,7 @@ services:
 
   hadoop-nodemanager:
     build:
-      context: ./images/hadoop
+      context: .
       dockerfile: Dockerfile
     container_name: hadoop-nodemanager
     hostname: hadoop-nodemanager
@@ -191,7 +191,7 @@ services:
 
   hadoop-historyserver:
     build:
-      context: ./images/hadoop
+      context: .
       dockerfile: Dockerfile
     container_name: hadoop-historyserver
     hostname: hadoop-historyserver
@@ -215,7 +215,7 @@ services:
   
   hbase-master:
     build:
-      context: ./images/hbase
+      context: .
       dockerfile: Dockerfile
     container_name: hbase-master
     hostname: hbase-master
@@ -241,7 +241,7 @@ services:
 
   hbase-regionserver:
     build:
-      context: ./images/hbase
+      context: .
       dockerfile: Dockerfile
     container_name: hbase-regionserver
     hostname: hbase-regionserver
@@ -267,7 +267,7 @@ services:
   
   hive-metastore:
     build:
-      context: ./images/hive
+      context: .
       dockerfile: Dockerfile
     container_name: hive-metastore
     hostname: hive-metastore
@@ -292,7 +292,7 @@ services:
 
   hive-server:
     build:
-      context: ./images/hive
+      context: .
       dockerfile: Dockerfile
     container_name: hive-server
     hostname: hive-server
@@ -319,7 +319,7 @@ services:
   
   spark-master:
     build:
-      context: ./images/spark
+      context: .
       dockerfile: Dockerfile
     container_name: spark-master
     hostname: spark-master
@@ -342,7 +342,7 @@ services:
 
   spark-worker:
     build:
-      context: ./images/spark
+      context: .
       dockerfile: Dockerfile
     container_name: spark-worker
     hostname: spark-worker
@@ -366,7 +366,7 @@ services:
   
   nifi:
     build:
-      context: ./images/nifi
+      context: .
       dockerfile: Dockerfile
     container_name: nifi
     hostname: nifi
@@ -393,7 +393,7 @@ services:
   
   flume:
     build:
-      context: ./images/flume
+      context: .
       dockerfile: Dockerfile
     container_name: flume
     hostname: flume
@@ -416,7 +416,7 @@ services:
 
   sqoop:
     build:
-      context: ./images/sqoop
+      context: .
       dockerfile: Dockerfile
     container_name: sqoop
     hostname: sqoop
@@ -434,7 +434,7 @@ services:
 
   oozie:
     build:
-      context: ./images/oozie
+      context: .
       dockerfile: Dockerfile
     container_name: oozie
     hostname: oozie
@@ -458,7 +458,7 @@ services:
 
   mahout:
     build:
-      context: ./images/mahout
+      context: .
       dockerfile: Dockerfile
     container_name: mahout
     hostname: mahout
@@ -476,7 +476,7 @@ services:
 
   pig:
     build:
-      context: ./images/pig
+      context: .
       dockerfile: Dockerfile
     container_name: pig
     hostname: pig
