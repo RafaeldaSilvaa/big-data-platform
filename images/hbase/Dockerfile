@@ -1,13 +1,13 @@
 # Big Data Platform - Apache HBase Image
-# HBase 2.5.7 for NoSQL storage
+# HBase 2.5.6 for NoSQL storage
 
 FROM bigdata-platform-hadoop:latest
 
 LABEL maintainer="Big Data Platform Team"
-LABEL description="Apache HBase 2.5.7"
+LABEL description="Apache HBase 2.5.6"
 
 # HBase version
-ENV HBASE_VERSION=2.5.7
+ENV HBASE_VERSION=2.5.6
 ENV HBASE_HOME=/opt/hbase-2.5.6
 ENV HBASE_CONF_DIR=${HBASE_HOME}/conf
 

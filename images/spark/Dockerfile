@@ -7,8 +7,8 @@ LABEL maintainer="Big Data Platform Team"
 LABEL description="Spark 3.5.1 image"
 
 # Spark version
-ENV SPARK_VERSION=3.5.1
-ENV SPARK_HOME=/opt/spark-3.5.0
+ENV SPARK_VERSION=3.5.0
+ENV SPARK_HOME=/opt/spark
 ENV SPARK_CONF_DIR=${SPARK_HOME}/conf
 
 # Install Spark

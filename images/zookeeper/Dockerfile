@@ -1,13 +1,13 @@
 # Big Data Platform - Apache ZooKeeper Image
-# ZooKeeper 3.9.2 for coordination
+# ZooKeeper 3.9.0 for coordination
 
 FROM bigdata-platform-hadoop:latest
 
 LABEL maintainer="Big Data Platform Team"
-LABEL description="Apache ZooKeeper 3.9.2"
+LABEL description="Apache ZooKeeper 3.9.0"
 
 # ZooKeeper version
-ENV ZOOKEEPER_VERSION=3.9.2
+ENV ZOOKEEPER_VERSION=3.9.0
 ENV ZOOKEEPER_HOME=/opt/zookeeper-3.9.0
 ENV ZOOKEEPER_CONF_DIR=${ZOOKEEPER_HOME}/conf
 
