@@ -8,14 +8,14 @@ LABEL description="Apache Sqoop"
 
 # Sqoop version
 ENV SQOOP_VERSION=1.4.7
-ENV SQOOP_HOME=/opt/sqoop-${SQOOP_VERSION}
+ENV SQOOP_HOME=/opt/sqoop-1.4.7
 ENV SQOOP_CONF_DIR=${SQOOP_HOME}/conf
 
 # Install Sqoop
-RUN wget -q https://archive.apache.org/dist/sqoop/${SQOOP_VERSION}/sqoop-${SQOOP_VERSION}.tar.gz && \
-    tar -xzf sqoop-${SQOOP_VERSION}.tar.gz -C /opt/ && \
-    rm sqoop-${SQOOP_VERSION}.tar.gz && \
-    ln -s /opt/sqoop-${SQOOP_VERSION} /opt/sqoop
+RUN wget -q https://archive.apache.org/dist/sqoop/1.4.7/sqoop-1.4.7.tar.gz && \
+    tar -xzf sqoop-1.4.7.tar.gz -C /opt/ && \
+    rm sqoop-1.4.7.tar.gz && \
+    ln -s /opt/sqoop-1.4.7 /opt/sqoop
 
 # Download PostgreSQL JDBC driver
 RUN wget -q https://jdbc.postgresql.org/download/postgresql-42.7.1.jar -P ${SQOOP_HOME}/lib/

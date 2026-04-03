@@ -8,15 +8,15 @@ LABEL description="Hadoop 3.4.0 image"
 
 # Hadoop version
 ENV HADOOP_VERSION=3.4.0
-ENV HADOOP_HOME=/opt/hadoop-${HADOOP_VERSION}
+ENV HADOOP_HOME=/opt/hadoop-3.4.0
 ENV HADOOP_CONF_DIR=${HADOOP_HOME}/etc/hadoop
 ENV PATH=${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${PATH}
 
 # Install Hadoop
-RUN wget -q https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz && \
-    tar -xzf hadoop-${HADOOP_VERSION}.tar.gz -C /opt/ && \
-    rm hadoop-${HADOOP_VERSION}.tar.gz && \
-    ln -s /opt/hadoop-${HADOOP_VERSION} /opt/hadoop
+RUN wget -q https://archive.apache.org/dist/hadoop/common/hadoop-3.4.0/hadoop-3.4.0.tar.gz && \
+    tar -xzf hadoop-3.4.0.tar.gz -C /opt/ && \
+    rm hadoop-3.4.0.tar.gz && \
+    ln -s /opt/hadoop-3.4.0 /opt/hadoop
 
 # Create Hadoop user and group
 RUN groupadd -g 1000 hadoop && \

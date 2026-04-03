@@ -9,14 +9,14 @@ LABEL description="Apache Kafka 3.7.0"
 # Kafka version
 ENV KAFKA_VERSION=3.7.0
 ENV SCALA_VERSION=2.13
-ENV KAFKA_HOME=/opt/kafka_${SCALA_VERSION}-${KAFKA_VERSION}
+ENV KAFKA_HOME=/opt/kafka_2.13-${KAFKA_VERSION}
 ENV KAFKA_CONF_DIR=${KAFKA_HOME}/config
 
 # Install Kafka
-RUN wget -q https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz && \
-    tar -xzf kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz -C /opt/ && \
-    rm kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz && \
-    ln -s /opt/kafka_${SCALA_VERSION}-${KAFKA_VERSION} /opt/kafka
+RUN wget -q https://archive.apache.org/dist/kafka/3.7.0/kafka_2.13-3.7.0.tgz && \
+    tar -xzf kafka_2.13-3.7.0.tgz -C /opt/ && \
+    rm kafka_2.13-3.7.0.tgz && \
+    ln -s /opt/kafka_2.13-${KAFKA_VERSION} /opt/kafka
 
 # Create directories
 RUN mkdir -p ${KAFKA_HOME}/logs \

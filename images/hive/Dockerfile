@@ -8,14 +8,14 @@ LABEL description="Hive 3.1.3 image with PostgreSQL driver"
 
 # Hive version
 ENV HIVE_VERSION=3.1.3
-ENV HIVE_HOME=/opt/apache-hive-${HIVE_VERSION}-bin
+ENV HIVE_HOME=/opt/apache-hive-3.1.3-bin
 ENV HIVE_CONF_DIR=${HIVE_HOME}/conf
 
 # Install Hive
-RUN wget -q https://archive.apache.org/dist/hive/hive-${HIVE_VERSION}/apache-hive-${HIVE_VERSION}-bin.tar.gz && \
-    tar -xzf apache-hive-${HIVE_VERSION}-bin.tar.gz -C /opt/ && \
-    rm apache-hive-${HIVE_VERSION}-bin.tar.gz && \
-    ln -s /opt/apache-hive-${HIVE_VERSION}-bin /opt/hive
+RUN wget -q https://archive.apache.org/dist/hive/hive-3.1.3/apache-hive-3.1.3-bin.tar.gz && \
+    tar -xzf apache-hive-3.1.3-bin.tar.gz -C /opt/ && \
+    rm apache-hive-3.1.3-bin.tar.gz && \
+    ln -s /opt/apache-hive-3.1.3-bin /opt/hive
 
 # Download PostgreSQL JDBC driver
 RUN wget -q https://jdbc.postgresql.org/download/postgresql-42.7.1.jar -P ${HIVE_HOME}/lib/

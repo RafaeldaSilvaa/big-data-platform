@@ -1,21 +1,24 @@
 # Big Data Platform - Apache NiFi Image
-# NiFi 1.25.0 for data ingestion
+# NiFi for data ingestion
 
 FROM bigdata-platform-hadoop:latest
 
 LABEL maintainer="Big Data Platform Team"
-LABEL description="Apache NiFi 1.25.0"
+LABEL description="Apache NiFi 1.15.3"
 
 # NiFi version
 ENV NIFI_VERSION=1.15.3
-ENV NIFI_HOME=/opt/nifi/nifi-${NIFI_VERSION}
+ENV NIFI_HOME=/opt/nifi/nifi-1.15.3
 ENV NIFI_CONF_DIR=${NIFI_HOME}/conf
 
+# Create directories first
+RUN mkdir -p /opt/nifi
+
 # Install NiFi
-RUN wget -q https://archive.apache.org/dist/nifi/nifi-${NIFI_VERSION}/nifi-${NIFI_VERSION}-bin.tar.gz && \
-    tar -xzf nifi-${NIFI_VERSION}-bin.tar.gz -C /opt/nifi/ && \
-    rm nifi-${NIFI_VERSION}-bin.tar.gz && \
-    ln -s /opt/nifi/nifi-${NIFI_VERSION} /opt/nifi/current
+RUN wget -q https://archive.apache.org/dist/nifi/1.15.3/nifi-1.15.3-bin.tar.gz && \
+    tar -xzf nifi-1.15.3-bin.tar.gz -C /opt/nifi/ && \
+    rm nifi-1.15.3-bin.tar.gz && \
+    ln -s /opt/nifi/nifi-1.15.3 /opt/nifi/current
 
 # Create directories
 RUN mkdir -p ${NIFI_HOME}/logs \

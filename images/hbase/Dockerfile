@@ -8,14 +8,14 @@ LABEL description="Apache HBase 2.5.7"
 
 # HBase version
 ENV HBASE_VERSION=2.5.7
-ENV HBASE_HOME=/opt/hbase-${HBASE_VERSION}
+ENV HBASE_HOME=/opt/hbase-2.5.6
 ENV HBASE_CONF_DIR=${HBASE_HOME}/conf
 
 # Install HBase
-RUN wget -q https://archive.apache.org/dist/hbase/${HBASE_VERSION}/hbase-${HBASE_VERSION}-bin.tar.gz && \
-    tar -xzf hbase-${HBASE_VERSION}-bin.tar.gz -C /opt/ && \
-    rm hbase-${HBASE_VERSION}-bin.tar.gz && \
-    ln -s /opt/hbase-${HBASE_VERSION} /opt/hbase
+RUN wget -q https://archive.apache.org/dist/hbase/2.5.6/hbase-2.5.6-bin.tar.gz && \
+    tar -xzf hbase-2.5.6-bin.tar.gz -C /opt/ && \
+    rm hbase-2.5.6-bin.tar.gz && \
+    ln -s /opt/hbase-2.5.6 /opt/hbase
 
 # Create directories
 RUN mkdir -p ${HBASE_HOME}/logs \

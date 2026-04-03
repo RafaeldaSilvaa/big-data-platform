@@ -8,14 +8,14 @@ LABEL description="Spark 3.5.1 image"
 
 # Spark version
 ENV SPARK_VERSION=3.5.1
-ENV SPARK_HOME=/opt/spark-${SPARK_VERSION}
+ENV SPARK_HOME=/opt/spark-3.5.0
 ENV SPARK_CONF_DIR=${SPARK_HOME}/conf
 
 # Install Spark
-RUN wget -q https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz && \
-    tar -xzf spark-${SPARK_VERSION}-bin-hadoop3.tgz -C /opt/ && \
-    rm spark-${SPARK_VERSION}-bin-hadoop3.tgz && \
-    ln -s /opt/spark-${SPARK_VERSION}-bin-hadoop3 /opt/spark
+RUN wget -q https://archive.apache.org/dist/spark/spark-3.5.0/spark-3.5.0-bin-hadoop3.tgz && \
+    tar -xzf spark-3.5.0-bin-hadoop3.tgz -C /opt/ && \
+    rm spark-3.5.0-bin-hadoop3.tgz && \
+    ln -s /opt/spark-3.5.0-bin-hadoop3 /opt/spark
 
 # Create Spark directories
 RUN mkdir -p ${SPARK_HOME}/logs \
