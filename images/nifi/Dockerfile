@@ -7,7 +7,7 @@ LABEL maintainer="Big Data Platform Team"
 LABEL description="Apache NiFi 1.25.0"
 
 # NiFi version
-ENV NIFI_VERSION=1.25.0
+ENV NIFI_VERSION=1.15.3
 ENV NIFI_HOME=/opt/nifi/nifi-${NIFI_VERSION}
 ENV NIFI_CONF_DIR=${NIFI_HOME}/conf
 
